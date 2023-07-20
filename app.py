@@ -4,6 +4,7 @@ from streamlit_chat import message
 import openai
 from webvtt import WebVTT
 
+
 with open("api-key.txt", "r") as file:
     openai.api_key = file.read().strip()
 
@@ -22,22 +23,26 @@ def generate_response(prompt):
 
 
 def main():
-    # Custom CSS to center the title on the line
+   # Custom CSS to center the title on the line
     st.markdown(
         """
         <style>
-        .center-title {
+        .block-container {
             text-align: center;
+
         }
+
+        .title {
+            align-self: flex-start;
         </style>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
-    # Display the centered title
-    st.markdown("<h1 class='center-title'>MeetGPT</h1>", unsafe_allow_html=True)
+    # logo = "logo.png"
+    # st.image(logo, use_column_width=True)
 
-
+    st.title("meetGPT")
 
     # Upload a video file
     video_file = st.file_uploader("Upload a video file", type=["mp4", "avi", "mov"])
@@ -75,7 +80,7 @@ def main():
         
 
             st.header("MeetBot - Your AI Meeting Q&A Assistant")
-            
+
             if 'generated' not in st.session_state:
                 st.session_state['generated'] = []
 
@@ -84,7 +89,7 @@ def main():
 
             def get_text():
                 input_text = st.text_input(
-                    "You: ", "", key="input")
+                    "You: ", "What are the highlights of the meeting?", key="input")
                 return input_text
 
             user_input = get_text()
@@ -110,6 +115,8 @@ def main():
                             is_user=True, key=str(i) + '_user')
                     message(st.session_state['generated'][i], key=str(i))
 
+            
+    # ... (previous code remains unchanged)
 
         elif selected_page == "NameMention":
             print("Name Mention")
@@ -145,28 +152,23 @@ def main():
                 else:
                     st.write("No mentions of your name found in the meeting transcript.")
 
-        
         elif selected_page == "EmailGen":
-            print("Email Gen")
-            st.markdown("# Email Gen Page")
-            # Get the user's name input
-            your_name = st.text_input("What is your name?")
-            if your_name:
-                email_name = st.text_input("Who would you like to email?")
-                if email_name:
-                    email_content = st.text_input("What should the email be about?")
-                    if email_content:
-                        with open("sample.txt", "r") as f:
-                            text_data_transcr = f.read()
-                        prompt = "Write an email to "+email_name+"from "+your_name+" about "+email_content+" using the following source of truth "+text_data_transcr
-                        generated_text = generate_response(prompt)
-                        st.write("Here is your email:")
-                        st.write(generated_text)
-
-                
-
-        # ... (rest of the code remains unchanged)
-
+                print("Email Gen")
+                st.markdown("# Email Gen Page")
+                # Get the user's name input
+                your_name = st.text_input("What is your name?")
+                if your_name:
+                    email_name = st.text_input("Who would you like to email?")
+                    if email_name:
+                        email_content = st.text_input("What should the email be about?")
+                        if email_content:
+                            with open("sample.txt", "r") as f:
+                                text_data_transcr = f.read()
+                            #prompt = "Write an email to "+email_name+"from "+your_name+" about "+email_content+" using the following source of truth "+text_data_transcr
+                            prompt = "My name is " + your_name + ". Write a one very short paragraph email from me to " + email_name + ", about " + email_content +". Do not repeat anything in the meeting transcript: \n" + text_data_transcr
+                            generated_text = generate_response(prompt)
+                            st.write("Here is your email:")
+                            st.write(generated_text)
 
 if __name__ == "__main__":
     x = generate_response("blank_init")
