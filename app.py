@@ -4,7 +4,7 @@ from streamlit_chat import message
 import openai
 from webvtt import WebVTT
 
-
+#A confirmation email that says I know my task and will keep him updated
 with open("api-key.txt", "r") as file:
     openai.api_key = file.read().strip()
 
@@ -62,18 +62,27 @@ def main():
         )
 
 
-        # Show content based on the selected option
-        if selected_page == "Summary":
-            st.write("This is the Summary page.")
-            with open("sample.txt", "r") as f:
-                text_data = f.read()
 
-            prompt = "give me a summary of this: " + text_data
-            generated_text = generate_response(prompt)
-            
-            print(generated_text)
-            
-            st.write(generated_text )
+        if selected_page == "Summary":
+            summary_levels = ["Select Summary Level", "Quick", "Normal", "Detailed"]
+            summary_level = st.selectbox("Select summary level:", summary_levels, index=0)
+            if summary_level != "Select Summary Level":
+                st.write(f"### Summary of meeting (Level: {summary_level}):")
+                with open("sample.txt", "r") as f:
+                    text_data = f.read()
+
+                # Modify the prompt based on the selected summary level
+                if summary_level == "Quick":
+                    prompt = "Give me a brief summary of this text: " + text_data
+                elif summary_level == "Normal":
+                    prompt = "Give me a summary of this meeting: " + text_data
+                else:  # Detailed
+                    prompt = "Provide a detailed summary of the meeting: " + text_data
+
+                generated_text = generate_response(prompt)
+                st.write(generated_text)
+
+
 
 
         elif selected_page == "MeetChat":
@@ -165,7 +174,7 @@ def main():
                             with open("sample.txt", "r") as f:
                                 text_data_transcr = f.read()
                             #prompt = "Write an email to "+email_name+"from "+your_name+" about "+email_content+" using the following source of truth "+text_data_transcr
-                            prompt = "My name is " + your_name + ". Write a one very short paragraph email from me to " + email_name + ", about " + email_content +". Do not repeat anything in the meeting transcript: \n" + text_data_transcr
+                            prompt = "My name is " + your_name + ". Write one very short paragraph email from me to " + email_name + ", about " + email_content +". Do not repeat anything in the meeting transcript and also generate a subject line for the email: \n" + text_data_transcr
                             generated_text = generate_response(prompt)
                             st.write("Here is your email:")
                             st.write(generated_text)
